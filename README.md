@@ -134,3 +134,4 @@ Global styles for the application.
 ## Summary
 
 Locator is a React application that leverages the Nominatim API and React Leaflet to provide location search and map display functionality. It offers a user-friendly way to find places and visualize them on a map.
+```

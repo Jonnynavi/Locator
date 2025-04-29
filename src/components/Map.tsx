@@ -16,7 +16,7 @@ function Map({ place }: MapProps){
             mapRef.current.flyTo([place.latitude, place.longitude]);
         }
     }, [place]);
-
+    
     return(
         <MapContainer ref={mapRef} center={[33.7, -84.4]} zoom={12} scrollWheelZoom className='h-100'>
             <TileLayer  url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'/>

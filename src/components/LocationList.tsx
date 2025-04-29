@@ -20,7 +20,7 @@ function LocationList({onPlaceClick} : LocationListProps){
     const renderList = () => {
         return places.map( place => {
             return(
-                <li className="list-group-item d-flex justify-content-between align-items-center">
+                <li className="list-group-item d-flex justify-content-between align-items-center" key={place.id}>
                     {place.name}
                     <button type="button" onClick={() => onPlaceClick(place)} className="ms-1 btn btn-primary">Go</button>
                 </li>

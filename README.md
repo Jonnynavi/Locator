@@ -1,55 +1,136 @@
-# React + TypeScript + Vite
+```markdown
+# Locator App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Locator is a React application that allows users to search for locations and view them on a map.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* **Location Search:** Users can enter a search term to find specific places.
+* **Search Results:** The app displays the top 5 matching locations from the search.
+* **Map Display:** Clicking on a search result will center the map on the selected location.
 
-## Expanding the ESLint configuration
+## Technologies Used
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+* React
+* TypeScript
+* React Leaflet
+* Nominatim OpenStreetMap API
+* Bootstrap
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Setup
+
+1.  **Install Dependencies:**
+
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+2.  **Run the Application:**
+
+    ```bash
+    npm start
+    # or
+    yarn start
+    ```
+
+## Code Highlights
+
+###   `src/api/search.ts`
+
+This file handles the communication with the Nominatim API.
+
+```typescript
+import { Place } from "./Place";
+
+interface SearchResponse {
+    features: {
+        geometry: {
+            coordinates: number[];
+        }
+        properties: {
+            place_id: number;
+            display_name: string;
+        }
+    }[]
+}
+
+
+export const search = async (term: string) => {
+    const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${term}&format=geojson&addressdetails=1&layer=address&limit=5`
+    );
+
+    const data: SearchResponse = await res.json();
+
+    const places: Place[] = data.features.map((feature) => {
+        return{
+            id: feature.properties.place_id,
+            name: feature.properties.display_name,
+            longitude: feature.geometry.coordinates[0],
+            latitude: feature.geometry.coordinates[1]
+        }
+    });
+
+    return places;
+};
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+* The `search` function fetches location data from the Nominatim API.
+* It constructs the API query with the search term and parameters to return GeoJSON data with address details, limited to 5 results.
+* The response is then processed to extract `id`, `name`, `longitude`, and `latitude` for each place.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+###   `src/api/Place.ts`
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+Defines the `Place` interface.
+
+```typescript
+export interface Place {
+    id: number;
+    name: string;
+    longitude: number;
+    latitude: number;
+}
 ```
-# Locator
+
+###   `src/styles/index.css`
+
+Global styles for the application.
+
+```css
+.app {height: 100vh;}
+
+.app__row {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+}
+
+.app__map {
+    height: 100%;
+    width: 100%;
+}
+
+.app__list {
+    width: 40%;
+}
+
+@media (max-width: 990px) {
+    .app__row{
+        flex-direction: column;
+    }
+    .app__list{
+        width: 100%;
+    }
+}
+```
+
+* Sets the app height to 100% of the viewport.
+* Defines the layout of the map and location list.
+* Uses a media query to adjust the layout for smaller screens, stacking the list and map vertically.
+
+## Summary
+
+Locator is a React application that leverages the Nominatim API and React Leaflet to provide location search and map display functionality. It offers a user-friendly way to find places and visualize them on a map.
